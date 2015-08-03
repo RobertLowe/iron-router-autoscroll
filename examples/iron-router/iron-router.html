@@ -1,0 +1,33 @@
+<head>
+  <title>iron-router</title>
+</head>
+
+<body>
+</body>
+
+<template name='nav'>
+  <a href='/one'>One</a>
+  <a href='/two'>Two</a>
+  <a href='/three#target'>Three</a>
+</template>
+
+<template name='one'>
+  {{> nav}}
+  <div style='height: 2000px'>Hello One</div>
+  {{> nav}}
+</template>
+
+<template name='two'>
+  {{> nav}}
+  <div style='height: 1000px'>Hello Two</div>
+  {{> nav}}
+  <div style='height: 1000px'>Hello Two</div>
+  {{> nav}}
+</template>
+
+<template name='three'>
+  {{> nav}}
+  <div style='height: 2000px'>Hello Three</div>
+  <a id="target"></a>
+  {{> nav}}
+</template>

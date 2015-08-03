@@ -19,6 +19,25 @@ window.onpopstate = function(event) {
   backToPosition = scrollPositions[window.location];
 };
 
+var scrollToPosition = function () {
+  var hash = window.location.hash;
+  var position;
+
+  if (backToPosition) {
+    position = backToPosition;
+    backToPosition = null;
+  } else if ($(hash).length) {
+    position = $(hash).offset().top;
+  }
+  else {
+    position = 0;
+  }
+
+  $('body,html').animate({
+    scrollTop: position
+  }, IronRouterAutoscroll.animationDuration);
+}
+
 // Scroll to the right place after changing routes. "The right place" is:
 // 1. The previous position if we're returning via the back button
 // 2. The element whose id is specified in the URL hash
@@ -30,22 +49,7 @@ var scrollToTop = function () {
   if (self.ready()) {
     // defer until after the DOM update so that the position can be correct
     Tracker.afterFlush(function () {
-      var hash = window.location.hash;
-      var position;
-
-      if (backToPosition) {
-        position = backToPosition;
-        backToPosition = null;
-      } else if ($(hash).length) {
-        position = $(hash).offset().top;
-      }
-      else {
-        position = 0;
-      }
-
-      $('body,html').animate({
-        scrollTop: position
-      }, IronRouterAutoscroll.animationDuration);
+      scrollToPosition()
     });
   }
 };
@@ -54,7 +58,18 @@ if (Package['iron:router']) {
   Package['iron:router'].Router.onStop(saveScrollPosition);
   Package['iron:router'].Router.onRun(scrollToTop);
 } else {
-  if (console.warn) {
-    console.warn("The okgrow:iron-router-autoscroll package requires iron:router, please add it.");
+
+  if (Package['meteorhacks:flow-router']) {
+    Package['meteorhacks:flow-router'].FlowRouter.triggers.exit([function(context){
+      saveScrollPosition()
+    }]);
+    Package['meteorhacks:flow-router'].FlowRouter.triggers.enter([function(context){
+      scrollToPosition()
+    }]);
+
+  } else {
+    if (console.warn) {
+      console.warn("The okgrow:iron-router-autoscroll package requires iron:router or meteorhacks:flow-router, please add one.");
+    }
   }
 }
